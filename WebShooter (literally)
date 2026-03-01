@@ -1,0 +1,71 @@
+(function() {
+    'use strict';
+    if (window.v_saboteur) return;
+    window.v_saboteur = true;
+
+    const ASSETS = {
+        bulletHole: 'https://raw.githubusercontent.com/developanidea/WebGunShooter/refs/heads/main/images/gunshotlolvelvet.png',
+        gunFirstPerson: 'https://raw.githubusercontent.com/developanidea/WebGunShooter/refs/heads/main/images/gunfirstpersonforvelvet.png',
+        shotSound: 'https://raw.githubusercontent.com/developanidea/WebGunShooter/main/Sounds/u_62htdrvg4y-gun-shot-359196.mp3'
+    };
+
+    const shootAudio = new Audio(ASSETS.shotSound);
+    shootAudio.volume = 0.5;
+
+    const gunHud = document.createElement('img');
+    gunHud.src = ASSETS.gunFirstPerson;
+    gunHud.id = 'v-gun-cursor';
+    
+    Object.assign(gunHud.style, {
+        position: 'fixed',
+        width: '350px',
+        pointerEvents: 'none',
+        zIndex: '1000001',
+        transition: 'transform 0.03s linear',
+        filter: 'drop-shadow(0px 5px 10px rgba(0,0,0,0.5))'
+    });
+    document.body.appendChild(gunHud);
+
+    document.addEventListener('mousemove', (e) => {
+        const offsetX = e.clientX - 100;
+        const offsetY = e.clientY - 150;
+        gunHud.style.left = offsetX + 'px';
+        gunHud.style.top = offsetY + 'px';
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        shootAudio.currentTime = 0;
+        shootAudio.play();
+
+        const hole = document.createElement('img');
+        hole.src = ASSETS.bulletHole;
+        
+        const rotation = Math.floor(Math.random() * 360);
+
+        Object.assign(hole.style, {
+            position: 'absolute',
+            left: (e.pageX - 40) + 'px',
+            top: (e.pageY - 40) + 'px',
+            width: '80px',
+            pointerEvents: 'none',
+            zIndex: '1000000',
+            userSelect: 'none',
+            transform: `rotate(${rotation}deg)`,
+            filter: 'invert(1) brightness(2) drop-shadow(0px 2px 4px rgba(0,0,0,0.8))'
+        });
+
+        document.body.appendChild(hole);
+
+        gunHud.style.transform = 'translateY(-15px) rotate(-10deg)';
+        setTimeout(() => gunHud.style.transform = 'none', 80);
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'c') {
+            const holes = document.querySelectorAll('img[src*="gunshotlolvelvet"]');
+            holes.forEach(h => h.remove());
+        }
+    });
+
+    document.body.style.cursor = 'crosshair';
+})();
